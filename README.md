@@ -48,5 +48,57 @@ After these two steps, one of the following task-specific analyses can be run:
    - balance analysis
    - sit-to-stand analysis
 
+
+
+# Automated Longitudinal Statistical Pipeline (R)
+
+## Overview
+This R script provides a robust, automated workflow for analyzing longitudinal biomechanical data (e.g., Gait, Balance, or EMG metrics). It is specifically designed for study designs with **two groups** and **two time points** (e.g., Pre/Post or T2/T3). 
+
+The pipeline's core strength is its **adaptive decision-making**: it automatically tests for statistical assumptions (normality and homoscedasticity) and selects the appropriate parametric or non-parametric test for each variable independently.
+
+## Features
+
+### 1. Data Transformation & Normality
+- Tests for normality using the **Shapiro-Wilk** test across group/time cells.
+- If normality is violated, the script attempts a series of transformations:
+  - Logarithmic ($log(x)$)
+  - Square Root ($\sqrt{x}$)
+  - Inverse ($1/x$)
+- If any transformation satisfies normality, it proceeds with parametric testing on the transformed scale.
+
+### 2. Statistical Testing
+- **Parametric (Mixed ANOVA):** Used for variables that meet normality and Levene’s test criteria. It calculates p-values for Group, Time, and Interaction effects.
+- **Non-Parametric (nparLD):** Used for variables that fail assumptions even after transformation. It applies the "Nonparametric Analysis of Longitudinal Data in Factorial Designs" (F1-LD-F1 design).
+- **Effect Sizes:** Calculates **Partial Eta Squared** ($\eta_p^2$) for parametric models.
+
+### 3. Post-hoc & Descriptive Metrics
+- Computes **Mean ± Standard Deviation** on the original scale for all variables.
+- Calculates **Mean Differences (MD)** with **95% Confidence Intervals (CI)**.
+- For non-parametric interactions, it uses the **Hodges-Lehmann** estimate for change scores.
+
+## Requirements
+The following R libraries are required:
+- `readxl`, `writexl` (File I/O)
+- `dplyr`, `tidyr`, `stringr` (Data manipulation)
+- `car`, `afex`, `emmeans` (Parametric modeling)
+- `effectsize` (Effect sizes)
+- `nparLD` (Non-parametric longitudinal analysis)
+
+## Input Format
+- **File:** `Sample input.xlsx`
+- **Structure:** Wide format with variables labeled with a time suffix (e.g., `Variable_2`, `Variable_3`).
+- **Required Columns:** `Case`, `Group2`, `Completed`.
+
+## Output
+1. **`Sample output.xlsx`**: A comprehensive summary table containing:
+   - Transformation applied (if any).
+   - Normality and Levene's test status.
+   - P-values for Group, Time, and Interaction.
+   - Effect sizes and Mean Differences with CIs.
+   - Descriptive statistics (Mean ± SD) for each group and time point.
+2. **`Sample output.RData`**: For further analysis within the R environment.
+
+
 ## Author
 Mohadeseh Jafarian
